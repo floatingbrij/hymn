@@ -1,27 +1,40 @@
 import type { SearchResult } from '../types.js';
-import YouTubeSR from 'youtube-sr';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
-const YouTube = YouTubeSR.default || YouTubeSR;
 
-// ── Search via youtube-sr (direct YouTube scraping, no API key) ──
+// ── Search via yt-dlp (reliable, no scraping breakage) ──
 
 export async function searchTracks(query: string): Promise<SearchResult[]> {
   try {
-    const results = await YouTube.search(query, { limit: 20, type: 'video' });
-    return results
-      .filter((v) => v.id && v.duration && v.duration > 0)
-      .map((v) => ({
-        videoId: v.id!,
-        title: v.title || 'Unknown',
-        artist: v.channel?.name || 'Unknown Artist',
-        thumbnail: v.thumbnail?.url || `https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`,
-        duration: Math.floor((v.duration || 0) / 1000),
-      }));
+    const { stdout } = await execAsync(
+      `yt-dlp "ytsearch20:${query.replace(/"/g, '\\"')}" --flat-playlist --dump-json --no-warnings`,
+      { timeout: 15000, maxBuffer: 10 * 1024 * 1024 }
+    );
+
+    const lines = stdout.trim().split('\n').filter(Boolean);
+    const results: SearchResult[] = [];
+
+    for (const line of lines) {
+      try {
+        const info = JSON.parse(line);
+        if (!info.id || !info.duration || info.duration < 10) continue;
+        results.push({
+          videoId: info.id,
+          title: info.title || 'Unknown',
+          artist: info.uploader || info.channel || 'Unknown Artist',
+          thumbnail: info.thumbnails?.[0]?.url || `https://i.ytimg.com/vi/${info.id}/mqdefault.jpg`,
+          duration: Math.floor(info.duration || 0),
+        });
+      } catch {
+        // Skip bad lines
+      }
+    }
+
+    return results;
   } catch (err) {
-    console.error('youtube-sr search failed:', err);
+    console.error('yt-dlp search failed:', err);
     throw err;
   }
 }
@@ -133,23 +146,6 @@ export async function getTrending(): Promise<SearchResult[]> {
     } catch (err) {
       console.error(`Trending source "${source}" failed:`, err);
     }
-  }
-
-  // Final fallback: use youtube-sr with safer parsing
-  try {
-    const results = await YouTube.search('top music hits', { limit: 20, type: 'video' });
-    const mapped = results
-      .filter((v) => v.id && v.duration && v.duration > 0)
-      .map((v) => ({
-        videoId: v.id!,
-        title: v.title || 'Unknown',
-        artist: v.channel?.name || 'Unknown Artist',
-        thumbnail: v.thumbnail?.url || `https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`,
-        duration: Math.floor((v.duration || 0) / 1000),
-      }));
-    if (mapped.length > 0) return mapped;
-  } catch (err) {
-    console.error('youtube-sr trending fallback failed:', err);
   }
 
   console.error('All trending sources failed');

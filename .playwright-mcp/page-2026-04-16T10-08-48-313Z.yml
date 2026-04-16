@@ -1,0 +1,88 @@
+- generic [ref=e3]:
+  - complementary [ref=e5]:
+    - button "hymn" [ref=e7] [cursor=pointer]:
+      - img [ref=e9]
+      - generic [ref=e12]: hymn
+    - navigation [ref=e13]:
+      - link "Home" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - text: Home
+      - link "Search" [ref=e18] [cursor=pointer]:
+        - /url: /search
+        - img [ref=e19]
+        - text: Search
+      - link "Library" [ref=e22] [cursor=pointer]:
+        - /url: /library
+        - img [ref=e23]
+        - text: Library
+      - link "Start a Jam" [ref=e29] [cursor=pointer]:
+        - /url: /jam
+        - img [ref=e30]
+        - text: Start a Jam
+    - button "Sign in" [ref=e34] [cursor=pointer]:
+      - img [ref=e35]
+      - text: Sign in
+  - main [ref=e38]:
+    - generic [ref=e642]:
+      - generic [ref=e643]:
+        - heading "Search" [level=1] [ref=e644]
+        - generic [ref=e645]:
+          - generic [ref=e646]:
+            - img [ref=e647]
+            - textbox "What do you want to listen to?" [active] [ref=e650]: Bohemian Rhapsody
+            - button [ref=e658] [cursor=pointer]:
+              - img [ref=e659]
+          - generic [ref=e661]:
+            - button "bohemian rhapsody" [ref=e662] [cursor=pointer]:
+              - img [ref=e663]
+              - text: bohemian rhapsody
+            - button "bohemian rhapsody karaoke" [ref=e666] [cursor=pointer]:
+              - img [ref=e667]
+              - text: bohemian rhapsody karaoke
+            - button "bohemian rhapsody piano" [ref=e670] [cursor=pointer]:
+              - img [ref=e671]
+              - text: bohemian rhapsody piano
+            - button "bohemian rhapsody queen" [ref=e674] [cursor=pointer]:
+              - img [ref=e675]
+              - text: bohemian rhapsody queen
+            - button "bohemian rhapsody movie" [ref=e678] [cursor=pointer]:
+              - img [ref=e679]
+              - text: bohemian rhapsody movie
+            - button "bohemian rhapsody flash mob" [ref=e682] [cursor=pointer]:
+              - img [ref=e683]
+              - text: bohemian rhapsody flash mob
+            - button "bohemian rhapsody live" [ref=e686] [cursor=pointer]:
+              - img [ref=e687]
+              - text: bohemian rhapsody live
+            - button "bohemian rhapsody lyrics" [ref=e690] [cursor=pointer]:
+              - img [ref=e691]
+              - text: bohemian rhapsody lyrics
+      - generic [ref=e694]:
+        - img [ref=e696]
+        - paragraph [ref=e699]: Nothing turned up
+        - paragraph [ref=e700]: Try different keywords or check the spelling. You can search by song title, artist, or lyrics.
+  - generic [ref=e115]:
+    - generic [ref=e117]:
+      - img [ref=e119]
+      - paragraph [ref=e122]: No track playing
+    - generic [ref=e123]:
+      - generic [ref=e124]:
+        - button "Shuffle" [ref=e125] [cursor=pointer]:
+          - img [ref=e126]
+        - button "Previous" [ref=e129] [cursor=pointer]:
+          - img [ref=e130]
+        - button "Play" [disabled] [ref=e132]:
+          - img [ref=e133]
+        - button "Next" [ref=e135] [cursor=pointer]:
+          - img [ref=e136]
+        - 'button "Repeat: off" [ref=e138] [cursor=pointer]':
+          - img [ref=e139]
+      - generic [ref=e143]:
+        - generic [ref=e144]: 0:00
+        - generic [ref=e147]: 0:00
+    - generic [ref=e148]:
+      - button "Mute" [ref=e150] [cursor=pointer]:
+        - img [ref=e151]
+      - button "Queue" [ref=e156] [cursor=pointer]:
+        - img [ref=e157]

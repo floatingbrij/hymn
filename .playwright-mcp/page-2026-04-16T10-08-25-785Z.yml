@@ -1,0 +1,72 @@
+- generic [ref=e3]:
+  - complementary [ref=e5]:
+    - button "hymn" [ref=e7] [cursor=pointer]:
+      - img [ref=e9]
+      - generic [ref=e12]: hymn
+    - navigation [ref=e13]:
+      - link "Home" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - text: Home
+      - link "Search" [ref=e18] [cursor=pointer]:
+        - /url: /search
+        - img [ref=e19]
+        - text: Search
+      - link "Library" [ref=e22] [cursor=pointer]:
+        - /url: /library
+        - img [ref=e23]
+        - text: Library
+      - link "Start a Jam" [ref=e29] [cursor=pointer]:
+        - /url: /jam
+        - img [ref=e30]
+        - text: Start a Jam
+    - button "Sign in" [ref=e34] [cursor=pointer]:
+      - img [ref=e35]
+      - text: Sign in
+  - main [ref=e38]:
+    - generic [ref=e40]:
+      - generic [ref=e41]:
+        - paragraph [ref=e42]: Good afternoon
+        - heading "What are we playing?" [level=1] [ref=e43]
+        - paragraph [ref=e44]: Stream ad-free. Start a jam with friends. No accounts needed.
+        - generic [ref=e45]:
+          - button "Find Music" [ref=e46] [cursor=pointer]:
+            - img [ref=e47]
+            - text: Find Music
+          - button "Start a Jam" [ref=e50] [cursor=pointer]:
+            - img [ref=e51]
+            - text: Start a Jam
+      - heading "Trending Now" [level=2] [ref=e55]:
+        - img [ref=e56]
+        - text: Trending Now
+      - generic [ref=e108]:
+        - paragraph [ref=e109]: Keyboard shortcuts
+        - generic [ref=e110]:
+          - generic [ref=e111]: Space Play/Pause
+          - generic [ref=e112]: Shift+→ Next
+          - generic [ref=e113]: Shift+← Previous
+          - generic [ref=e114]: Shift+↑/↓ Volume
+  - generic [ref=e115]:
+    - generic [ref=e117]:
+      - img [ref=e119]
+      - paragraph [ref=e122]: No track playing
+    - generic [ref=e123]:
+      - generic [ref=e124]:
+        - button "Shuffle" [ref=e125] [cursor=pointer]:
+          - img [ref=e126]
+        - button "Previous" [ref=e129] [cursor=pointer]:
+          - img [ref=e130]
+        - button "Play" [disabled] [ref=e132]:
+          - img [ref=e133]
+        - button "Next" [ref=e135] [cursor=pointer]:
+          - img [ref=e136]
+        - 'button "Repeat: off" [ref=e138] [cursor=pointer]':
+          - img [ref=e139]
+      - generic [ref=e143]:
+        - generic [ref=e144]: 0:00
+        - generic [ref=e147]: 0:00
+    - generic [ref=e148]:
+      - button "Mute" [ref=e150] [cursor=pointer]:
+        - img [ref=e151]
+      - button "Queue" [ref=e156] [cursor=pointer]:
+        - img [ref=e157]
