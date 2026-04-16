@@ -219,6 +219,27 @@ export function initJamHandler(io: Server) {
       io.to(`jam:${session.id}`).emit('jam:state-update', getSessionState(session));
     });
 
+    // ── Sync full queue (used when creating jam with existing queue) ──
+    socket.on('jam:queue:sync', ({ tracks, currentIndex, isPlaying, position }: {
+      tracks: Track[]; currentIndex: number; isPlaying: boolean; position: number;
+    }) => {
+      const session = findSessionBySocket(socket.id);
+      if (!session) return;
+      if (session.hostId !== socket.id) return; // Only host can bulk-sync
+
+      const participant = session.participants.get(socket.id);
+      session.queue = tracks.map(t => ({
+        ...t,
+        addedBy: t.addedBy || participant?.nickname || 'Host',
+      }));
+      session.currentTrackIndex = Math.min(Math.max(currentIndex, -1), session.queue.length - 1);
+      session.isPlaying = isPlaying;
+      session.playbackPosition = position;
+      session.lastStateUpdate = Date.now();
+
+      io.to(`jam:${session.id}`).emit('jam:state-update', getSessionState(session));
+    });
+
     // ── Disconnect ──
     socket.on('disconnect', () => {
       leaveCurrentJam(io, socket);

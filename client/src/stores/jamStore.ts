@@ -4,6 +4,7 @@ import { connectSocket, disconnectSocket, getSocket } from '../services/socket';
 import { usePlayerStore } from './playerStore';
 import { useQueueStore } from './queueStore';
 import { generateTrackId } from '../utils/format';
+import { audioEngine } from '../services/audioEngine';
 
 interface JamStore {
   isInJam: boolean;
@@ -90,18 +91,22 @@ export const useJamStore = create<JamStore>((set, get) => {
 
     // Override track-end to use jam-aware next
     (usePlayerStore.getState() as any).onTrackEnd = () => {
-      const { isInJam } = get();
-      const { repeat } = useQueueStore.getState();
+      const { isInJam, isHost } = get();
       if (isInJam) {
-        if (repeat === 'one') {
-          // Replay current track — seek to 0 and play
-          const socket = getSocket();
-          socket.emit('jam:seek', { position: 0 });
-          socket.emit('jam:play', { position: 0 });
-        } else {
-          getSocket().emit('jam:next');
+        // Only host advances to prevent multiple clients from double-skipping
+        if (isHost) {
+          const { repeat } = useQueueStore.getState();
+          if (repeat === 'one') {
+            const socket = getSocket();
+            socket.emit('jam:seek', { position: 0 });
+            socket.emit('jam:play', { position: 0 });
+          } else {
+            getSocket().emit('jam:next');
+          }
         }
+        // Non-host clients wait for server's jam:state-update
       } else {
+        const { repeat } = useQueueStore.getState();
         if (repeat === 'one') {
           const track = useQueueStore.getState().tracks[useQueueStore.getState().currentIndex];
           if (track) usePlayerStore.getState().loadAndPlay(track);
@@ -113,7 +118,6 @@ export const useJamStore = create<JamStore>((set, get) => {
   }
 
   function applyJamState(state: JamState) {
-    const queueStore = useQueueStore.getState();
     const playerStore = usePlayerStore.getState();
 
     // Update participants
@@ -138,29 +142,44 @@ export const useJamStore = create<JamStore>((set, get) => {
 
     // Handle playback sync
     const currentTrack = tracks[state.currentTrackIndex];
-    if (currentTrack) {
-      const isNewTrack = playerStore.currentTrack?.videoId !== currentTrack.videoId;
-      if (isNewTrack) {
-        playerStore.loadAndPlay(currentTrack).then(() => {
-          if (!state.isPlaying) {
-            playerStore.pause();
-          }
-          // Seek to synced position
-          if (state.playbackPosition > 0.5) {
-            playerStore.seek(state.playbackPosition);
-          }
-        });
-      } else {
-        // Same track — sync play/pause state
-        if (state.isPlaying && !playerStore.isPlaying) {
-          playerStore.play();
-        } else if (!state.isPlaying && playerStore.isPlaying) {
-          playerStore.pause();
-        }
+    if (!currentTrack) {
+      // Queue is empty or no valid track — stop playback
+      if (playerStore.isPlaying) {
+        playerStore.pause();
+      }
+      return;
+    }
 
-        // Correct drift
+    const isNewTrack = playerStore.currentTrack?.videoId !== currentTrack.videoId;
+    if (isNewTrack) {
+      playerStore.loadAndPlay(currentTrack).then(() => {
+        // Read FRESH state after async load (not stale closure)
+        const ps = usePlayerStore.getState();
+        if (ps.currentTrack?.videoId !== currentTrack.videoId) return;
+
+        if (!state.isPlaying) {
+          ps.pause();
+        } else if (state.playbackPosition > 0.5) {
+          ps.seek(state.playbackPosition);
+        }
+      });
+    } else {
+      // Same track — sync play/pause state
+      if (state.isPlaying && !playerStore.isPlaying && !playerStore.isLoading) {
+        // If audio engine has no loaded source (previous load failed), retry load
+        if (playerStore.error || !audioEngine.isReady()) {
+          playerStore.loadAndPlay(currentTrack);
+        } else {
+          playerStore.play();
+        }
+      } else if (!state.isPlaying && playerStore.isPlaying) {
+        playerStore.pause();
+      }
+
+      // Correct drift (only when playing)
+      if (state.isPlaying) {
         const drift = Math.abs(playerStore.position - state.playbackPosition);
-        if (drift > 1.5) {
+        if (drift > 2) {
           playerStore.seek(state.playbackPosition);
         }
       }
@@ -178,6 +197,8 @@ export const useJamStore = create<JamStore>((set, get) => {
 
     createJam: async (nickname) => {
       set({ error: null });
+      // Unlock audio context during user gesture (button click)
+      audioEngine.unlockAudio();
       const socket = connectSocket();
       set({ nickname, mySocketId: socket.id || null });
       setupListeners();
@@ -212,6 +233,19 @@ export const useJamStore = create<JamStore>((set, get) => {
               participants: response.jam.participants,
               error: null,
             });
+
+            // Sync current queue and playback state to the new jam
+            const { tracks, currentIndex } = useQueueStore.getState();
+            const { currentTrack, isPlaying: nowPlaying, position: nowPos } = usePlayerStore.getState();
+            if (tracks.length > 0 && currentTrack) {
+              socket.emit('jam:queue:sync', {
+                tracks,
+                currentIndex: Math.max(0, currentIndex),
+                isPlaying: nowPlaying,
+                position: nowPos,
+              });
+            }
+
             resolve(response.jam.id);
           } else {
             set({ error: response.error || 'Failed to create jam' });
@@ -223,6 +257,8 @@ export const useJamStore = create<JamStore>((set, get) => {
 
     joinJam: async (code, nickname) => {
       set({ error: null });
+      // Unlock audio context during user gesture (button click)
+      audioEngine.unlockAudio();
       const socket = connectSocket();
       set({ nickname, mySocketId: socket.id || null });
       setupListeners();

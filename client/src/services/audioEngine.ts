@@ -1,4 +1,4 @@
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 import { getStreamInfo, getStreamUrl } from './api';
 
 type AudioCallback = () => void;
@@ -31,6 +31,7 @@ class AudioEngine {
   private currentVideoId: string | null = null;
   private animFrameId: number | null = null;
   private ytProgressInterval: ReturnType<typeof setInterval> | null = null;
+  private loadGeneration = 0;
 
   private onPlayCb: AudioCallback | null = null;
   private onPauseCb: AudioCallback | null = null;
@@ -52,6 +53,7 @@ class AudioEngine {
 
     this.destroy();
     this.currentVideoId = videoId;
+    const generation = ++this.loadGeneration;
 
     // First, try getting a direct audio URL from the server (via Invidious/yt-dlp).
     let directUrl: string | null = null;
@@ -67,7 +69,7 @@ class AudioEngine {
 
     return new Promise((resolve, reject) => {
       const tryYouTubeFallback = async () => {
-        // Fall back to YouTube IFrame Player API (official, always works)
+        if (this.loadGeneration !== generation) return; // stale load, don't interfere
         console.log('Falling back to YouTube IFrame Player');
         this.destroyHowl();
         try {
@@ -107,6 +109,7 @@ class AudioEngine {
           this.stopProgressLoop();
         },
         onloaderror: (_id, _err) => {
+          if (this.loadGeneration !== generation) return; // stale load
           // If direct URL failed, retry with proxy
           if (primaryUrl !== proxyUrl && this.currentVideoId === videoId) {
             console.warn('Direct audio failed, falling back to proxy');
@@ -122,7 +125,7 @@ class AudioEngine {
               onpause: () => { this.onPauseCb?.(); this.stopProgressLoop(); },
               onstop: () => { this.onPauseCb?.(); this.stopProgressLoop(); },
               onend: () => { this.onEndCb?.(); this.stopProgressLoop(); },
-              onloaderror: () => { tryYouTubeFallback(); },
+              onloaderror: () => { if (this.loadGeneration === generation) tryYouTubeFallback(); },
               onplayerror: (_id2, err2) => {
                 const msg = typeof err2 === 'string' ? err2 : 'Playback error';
                 this.onErrorCb?.(msg);
@@ -139,6 +142,33 @@ class AudioEngine {
         },
       });
     });
+  }
+
+  /** Call during a user gesture (tap/click) to unlock audio on mobile browsers.
+   *  Just resuming AudioContext isn't enough on iOS/Android — we must play
+   *  a real (silent) audio buffer during the gesture to unlock HTML5 Audio. */
+  unlockAudio(): void {
+    try {
+      // 1. Resume the Web Audio context
+      if (Howler.ctx && Howler.ctx.state === 'suspended') {
+        Howler.ctx.resume();
+      }
+      // 2. Play a tiny silent Howl to unlock HTML5 Audio on mobile.
+      //    This runs during the user tap, satisfying the autoplay policy.
+      const silentHowl = new Howl({
+        src: ['data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA='],
+        volume: 0,
+        html5: true,
+        autoplay: true,
+        onend: () => { silentHowl.unload(); },
+        onloaderror: () => { silentHowl.unload(); },
+        onplayerror: () => { silentHowl.unload(); },
+      });
+    } catch {}
+  }
+
+  isReady(): boolean {
+    return !!(this.howl || (this.usingYT && this.ytPlayer));
   }
 
   play(): void {
