@@ -7,6 +7,75 @@ export const playlistRouter: RouterType = Router();
 // All playlist routes require auth
 playlistRouter.use(authMiddleware as any);
 
+// ── Liked Tracks (must be before /:id routes) ──
+
+playlistRouter.get('/liked/tracks', (req: AuthRequest, res) => {
+  const db = getDb();
+  const tracks = db.prepare('SELECT * FROM liked_tracks WHERE user_id = ? ORDER BY created_at DESC').all(req.userId!);
+  res.json(tracks);
+});
+
+playlistRouter.post('/liked/tracks', (req: AuthRequest, res) => {
+  const { videoId, title, artist, thumbnail, duration } = req.body;
+  if (!videoId || !title) {
+    res.status(400).json({ error: 'videoId and title are required' });
+    return;
+  }
+
+  const db = getDb();
+  try {
+    db.prepare(
+      'INSERT OR IGNORE INTO liked_tracks (user_id, video_id, title, artist, thumbnail, duration) VALUES (?, ?, ?, ?, ?, ?)'
+    ).run(req.userId!, videoId, title, artist || 'Unknown', thumbnail || '', duration || 0);
+    res.status(201).json({ liked: true });
+  } catch {
+    res.status(500).json({ error: 'Failed to like track' });
+  }
+});
+
+playlistRouter.delete('/liked/tracks/:videoId', (req: AuthRequest, res) => {
+  const db = getDb();
+  db.prepare('DELETE FROM liked_tracks WHERE user_id = ? AND video_id = ?').run(req.userId!, req.params.videoId);
+  res.json({ liked: false });
+});
+
+// Batch import — create playlist + add all tracks in one transaction (must be before /:id routes)
+playlistRouter.post('/import', (req: AuthRequest, res) => {
+  const { name, tracks } = req.body;
+  if (!name || !Array.isArray(tracks) || tracks.length === 0) {
+    res.status(400).json({ error: 'name and tracks[] are required' });
+    return;
+  }
+
+  const db = getDb();
+  try {
+    const txn = db.transaction(() => {
+      const result = db.prepare('INSERT INTO playlists (user_id, name) VALUES (?, ?)').run(req.userId!, name.trim());
+      const playlistId = result.lastInsertRowid;
+
+      const insert = db.prepare(
+        'INSERT INTO playlist_tracks (playlist_id, video_id, title, artist, thumbnail, duration, position) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      );
+
+      tracks.forEach((t: any, i: number) => {
+        if (t.videoId && t.title) {
+          insert.run(playlistId, t.videoId, t.title, t.artist || 'Unknown', t.thumbnail || '', t.duration || 0, i + 1);
+        }
+      });
+
+      return { id: Number(playlistId), name: name.trim(), track_count: tracks.length };
+    });
+
+    const playlist = txn();
+    res.status(201).json(playlist);
+  } catch (err) {
+    console.error('Batch import failed:', err);
+    res.status(500).json({ error: 'Failed to import playlist' });
+  }
+});
+
+// ── Playlist CRUD ──
+
 // Get all playlists for user
 playlistRouter.get('/', (req: AuthRequest, res) => {
   const db = getDb();
@@ -90,41 +159,6 @@ playlistRouter.delete('/:id/tracks/:trackId', (req: AuthRequest, res) => {
   res.json({ success: true });
 });
 
-// Batch import — create playlist + add all tracks in one transaction
-playlistRouter.post('/import', (req: AuthRequest, res) => {
-  const { name, tracks } = req.body;
-  if (!name || !Array.isArray(tracks) || tracks.length === 0) {
-    res.status(400).json({ error: 'name and tracks[] are required' });
-    return;
-  }
-
-  const db = getDb();
-  try {
-    const txn = db.transaction(() => {
-      const result = db.prepare('INSERT INTO playlists (user_id, name) VALUES (?, ?)').run(req.userId!, name.trim());
-      const playlistId = result.lastInsertRowid;
-
-      const insert = db.prepare(
-        'INSERT INTO playlist_tracks (playlist_id, video_id, title, artist, thumbnail, duration, position) VALUES (?, ?, ?, ?, ?, ?, ?)'
-      );
-
-      tracks.forEach((t: any, i: number) => {
-        if (t.videoId && t.title) {
-          insert.run(playlistId, t.videoId, t.title, t.artist || 'Unknown', t.thumbnail || '', t.duration || 0, i + 1);
-        }
-      });
-
-      return { id: Number(playlistId), name: name.trim(), track_count: tracks.length };
-    });
-
-    const playlist = txn();
-    res.status(201).json(playlist);
-  } catch (err) {
-    console.error('Batch import failed:', err);
-    res.status(500).json({ error: 'Failed to import playlist' });
-  }
-});
-
 // Delete playlist
 playlistRouter.delete('/:id', (req: AuthRequest, res) => {
   const db = getDb();
@@ -136,36 +170,4 @@ playlistRouter.delete('/:id', (req: AuthRequest, res) => {
   }
 
   res.json({ success: true });
-});
-
-// ── Liked Tracks ──
-
-playlistRouter.get('/liked/tracks', (req: AuthRequest, res) => {
-  const db = getDb();
-  const tracks = db.prepare('SELECT * FROM liked_tracks WHERE user_id = ? ORDER BY created_at DESC').all(req.userId!);
-  res.json(tracks);
-});
-
-playlistRouter.post('/liked/tracks', (req: AuthRequest, res) => {
-  const { videoId, title, artist, thumbnail, duration } = req.body;
-  if (!videoId || !title) {
-    res.status(400).json({ error: 'videoId and title are required' });
-    return;
-  }
-
-  const db = getDb();
-  try {
-    db.prepare(
-      'INSERT OR IGNORE INTO liked_tracks (user_id, video_id, title, artist, thumbnail, duration) VALUES (?, ?, ?, ?, ?, ?)'
-    ).run(req.userId!, videoId, title, artist || 'Unknown', thumbnail || '', duration || 0);
-    res.status(201).json({ liked: true });
-  } catch {
-    res.status(500).json({ error: 'Failed to like track' });
-  }
-});
-
-playlistRouter.delete('/liked/tracks/:videoId', (req: AuthRequest, res) => {
-  const db = getDb();
-  db.prepare('DELETE FROM liked_tracks WHERE user_id = ? AND video_id = ?').run(req.userId!, req.params.videoId);
-  res.json({ liked: false });
 });
