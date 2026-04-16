@@ -29,6 +29,11 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
+// Health check
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok' });
+});
+
 // API routes
 app.use('/api/search', searchRouter);
 app.use('/api/stream', streamRouter);
@@ -49,6 +54,7 @@ initDb();
 initJamHandler(io);
 
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
-  console.log(`🎵 Hymn server running on port ${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+server.listen(Number(PORT), HOST, () => {
+  console.log(`🎵 Hymn server running on ${HOST}:${PORT}`);
 });
