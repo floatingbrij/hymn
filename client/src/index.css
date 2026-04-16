@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #3d342a transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #3d342a;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #c08b5f;
+  }
+
+  body {
+    overflow: hidden;
+    font-family: 'Figtree', system-ui, sans-serif;
+  }
+
+  /* Accessibility: respect users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-surface-200/60 border border-surface-400/50;
+  }
+
+  .panel-hover {
+    @apply hover:bg-surface-300/60 transition-colors duration-200;
+  }
+
+  .btn-primary {
+    @apply px-5 py-2.5 rounded-lg bg-accent text-surface font-medium
+           hover:bg-accent-light transition-all duration-200
+           active:scale-[0.97] hover:shadow-lg hover:shadow-accent/10;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 rounded-lg text-cream-dim hover:text-cream
+           hover:bg-surface-300/60 transition-all duration-200
+           active:scale-[0.97];
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-lg bg-surface-200 border border-surface-400
+           text-cream placeholder-cream-muted focus:outline-none focus:border-accent
+           focus:ring-1 focus:ring-accent/30 transition-all duration-200;
+  }
+
+  /* Like button pop animation */
+  .like-pop {
+    animation: likePop 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  @keyframes likePop {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.35); }
+    60% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+
+  /* Fade-in-up for staggered reveals */
+  .fade-in-up {
+    animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) both;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Scale-in for menus/dropdowns */
+  .scale-in {
+    animation: scaleIn 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Slide-down for error banners */
+  .slide-down {
+    animation: slideDown 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+}
+
+/* Mobile-specific styles */
+@layer utilities {
+  /* Prevent text selection on interactive mobile elements */
+  .touch-action-none {
+    touch-action: none;
+  }
+
+  /* Prevent pull-to-refresh on mobile when scrolling in the app */
+  html {
+    overscroll-behavior: none;
+  }
+
+  /* Disable tap highlight on mobile */
+  @media (max-width: 767px) {
+    button, a, [role="button"] {
+      -webkit-tap-highlight-color: transparent;
+    }
+  }
+}
