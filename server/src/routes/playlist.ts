@@ -90,6 +90,41 @@ playlistRouter.delete('/:id/tracks/:trackId', (req: AuthRequest, res) => {
   res.json({ success: true });
 });
 
+// Batch import — create playlist + add all tracks in one transaction
+playlistRouter.post('/import', (req: AuthRequest, res) => {
+  const { name, tracks } = req.body;
+  if (!name || !Array.isArray(tracks) || tracks.length === 0) {
+    res.status(400).json({ error: 'name and tracks[] are required' });
+    return;
+  }
+
+  const db = getDb();
+  try {
+    const txn = db.transaction(() => {
+      const result = db.prepare('INSERT INTO playlists (user_id, name) VALUES (?, ?)').run(req.userId!, name.trim());
+      const playlistId = result.lastInsertRowid;
+
+      const insert = db.prepare(
+        'INSERT INTO playlist_tracks (playlist_id, video_id, title, artist, thumbnail, duration, position) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      );
+
+      tracks.forEach((t: any, i: number) => {
+        if (t.videoId && t.title) {
+          insert.run(playlistId, t.videoId, t.title, t.artist || 'Unknown', t.thumbnail || '', t.duration || 0, i + 1);
+        }
+      });
+
+      return { id: Number(playlistId), name: name.trim(), track_count: tracks.length };
+    });
+
+    const playlist = txn();
+    res.status(201).json(playlist);
+  } catch (err) {
+    console.error('Batch import failed:', err);
+    res.status(500).json({ error: 'Failed to import playlist' });
+  }
+});
+
 // Delete playlist
 playlistRouter.delete('/:id', (req: AuthRequest, res) => {
   const db = getDb();

@@ -115,8 +115,8 @@ spotifyRouter.post('/import', async (req, res) => {
       return;
     }
 
-    // Cap at 50 tracks for YouTube matching
-    const tracksToProcess = playlistData.tracks.slice(0, 50);
+    // Process all tracks (up to 200 from fetch)
+    const tracksToProcess = playlistData.tracks;
 
     // Search YouTube for each track in batches of 5
     const batchSize = 5;
@@ -126,7 +126,17 @@ spotifyRouter.post('/import', async (req, res) => {
       const batch = tracksToProcess.slice(i, i + batchSize);
       const batchResults = await Promise.allSettled(
         batch.map(async (track) => {
-          const query = `${track.name} ${track.artists}`;
+          // Clean up search query for better matching
+          const cleanName = track.name
+            .replace(/\s*\(feat\..*?\)/gi, '')      // remove (feat. ...)
+            .replace(/\s*\[feat\..*?\]/gi, '')      // remove [feat. ...]
+            .replace(/\s*\(with\s.*?\)/gi, '')      // remove (with ...)
+            .replace(/\s*\(Remaster(ed)?\)/gi, '')  // remove (Remastered)
+            .replace(/\s*-\s*Remaster(ed)?/gi, '') // remove - Remastered
+            .trim();
+          // Use primary artist only for cleaner query
+          const primaryArtist = track.artists.split(',')[0].trim();
+          const query = `${cleanName} ${primaryArtist}`;
           const searchResults = await searchTracks(query);
           return searchResults[0] || null;
         })

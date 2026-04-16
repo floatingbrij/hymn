@@ -113,13 +113,10 @@ export function LibraryPage() {
   const addImportAsPlaylist = async () => {
     if (!importResult) return;
     try {
-      const pl = await api.createPlaylist(importResult.playlistName);
-      for (const track of importResult.matchedTracks) {
-        await api.addToPlaylist(pl.id, track);
-      }
+      await api.batchImportPlaylist(importResult.playlistName, importResult.matchedTracks);
       toast.success(`Created playlist "${importResult.playlistName}" with ${importResult.matchedTracks.length} songs`);
       closeImportModal();
-      loadData();
+      await loadData();
     } catch {
       toast.error('Failed to save playlist');
     }
@@ -396,7 +393,6 @@ export function LibraryPage() {
                     <h4 className="font-display text-cream">{importResult.playlistName}</h4>
                     <p className="text-cream-muted text-xs mt-1">
                       {importResult.matchedTracks.length} of {importResult.totalTracks} tracks matched
-                      {importResult.totalTracks > 50 && ' (first 50 processed)'}
                     </p>
                   </div>
 

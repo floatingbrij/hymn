@@ -114,6 +114,13 @@ export const likeTrack = (track: SearchResult) =>
 export const unlikeTrack = (videoId: string) =>
   apiFetch<any>(`/playlists/liked/tracks/${videoId}`, { method: 'DELETE' });
 
+// Batch import — create playlist + add all tracks in one request
+export const batchImportPlaylist = (name: string, tracks: SearchResult[]) =>
+  apiFetch<{ id: number; name: string; track_count: number }>('/playlists/import', {
+    method: 'POST',
+    body: JSON.stringify({ name, tracks }),
+  });
+
 // Spotify import
 export const importSpotifyPlaylist = (url: string) =>
   apiFetch<{ playlistName: string; totalTracks: number; matchedTracks: SearchResult[] }>('/spotify/import', {
