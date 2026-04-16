@@ -25,6 +25,7 @@ RUN npm install -g tsx
 COPY server/ server/
 COPY --from=client-build /app/client/dist client/dist
 
+ENV NODE_OPTIONS="--max-old-space-size=180"
 ENV NODE_ENV=production
 ENV PORT=3001
 EXPOSE 3001

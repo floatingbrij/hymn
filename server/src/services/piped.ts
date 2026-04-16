@@ -9,8 +9,8 @@ const execAsync = promisify(exec);
 export async function searchTracks(query: string): Promise<SearchResult[]> {
   try {
     const { stdout } = await execAsync(
-      `yt-dlp "ytsearch10:${query.replace(/"/g, '\\"')}" --flat-playlist --dump-json --no-warnings --no-cache-dir`,
-      { timeout: 15000, maxBuffer: 2 * 1024 * 1024 }
+      `yt-dlp "ytsearch5:${query.replace(/"/g, '\\"')}" --flat-playlist --dump-json --no-warnings --no-cache-dir`,
+      { timeout: 15000, maxBuffer: 1024 * 1024 }
     );
 
     const lines = stdout.trim().split('\n').filter(Boolean);
@@ -71,7 +71,7 @@ const INVIDIOUS_INSTANCES = [
 // LRU cache with size limit — stream URLs expire after 15 min
 const streamCache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 15 * 60 * 1000;
-const CACHE_MAX_SIZE = 30;
+const CACHE_MAX_SIZE = 15;
 
 // Evict oldest entries when cache exceeds max size
 function cacheSet(key: string, data: any) {
@@ -150,7 +150,7 @@ export async function getStreamInfo(videoId: string) {
   try {
     const { stdout } = await execAsync(
       `yt-dlp -f "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio" --dump-json --no-download --no-warnings --no-cache-dir "https://www.youtube.com/watch?v=${videoId}"`,
-      { timeout: 30000, maxBuffer: 2 * 1024 * 1024 }
+      { timeout: 30000, maxBuffer: 1024 * 1024 }
     );
 
     const info = JSON.parse(stdout);
@@ -181,15 +181,14 @@ export async function getTrending(): Promise<SearchResult[]> {
   // Use yt-dlp to extract videos from YouTube's trending music page / playlists
   // This is more reliable than youtube-sr which crashes on certain result types
   const sources = [
-    'ytsearch15:official music video',
-    'ytsearch15:new song official audio',
+    'ytsearch10:official music video',
   ];
 
   for (const source of sources) {
     try {
       const { stdout } = await execAsync(
         `yt-dlp --flat-playlist --dump-json --no-warnings --no-cache-dir "${source}"`,
-        { timeout: 30000, maxBuffer: 2 * 1024 * 1024 }
+        { timeout: 30000, maxBuffer: 1024 * 1024 }
       );
 
       const lines = stdout.trim().split('\n').filter(Boolean);

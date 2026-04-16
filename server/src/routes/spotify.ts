@@ -74,14 +74,14 @@ async function fetchSpotifyPlaylist(playlistId: string): Promise<{ name: string;
     });
   }
 
-  // Fetch remaining pages (up to 200 tracks total)
+  // Fetch remaining pages (up to 50 tracks to stay within 256MB memory)
   let nextUrl = data.tracks?.next;
-  while (nextUrl && tracks.length < 200) {
+  while (nextUrl && tracks.length < 50) {
     const pageRes = await fetch(nextUrl, { headers: { Authorization: `Bearer ${token}` } });
     if (!pageRes.ok) break;
     const page = await pageRes.json();
     for (const item of page.items || []) {
-      if (!item.track || tracks.length >= 200) break;
+      if (!item.track || tracks.length >= 50) break;
       tracks.push({
         name: item.track.name,
         artists: item.track.artists?.map((a: any) => a.name).join(', ') || 'Unknown',
@@ -115,37 +115,27 @@ spotifyRouter.post('/import', async (req, res) => {
       return;
     }
 
-    // Process all tracks (up to 200 from fetch)
-    const tracksToProcess = playlistData.tracks;
+    // Cap at 50 tracks to avoid OOM on 256MB instance
+    const tracksToProcess = playlistData.tracks.slice(0, 50);
 
-    // Search YouTube for each track in batches of 3 (memory-conscious)
-    const batchSize = 3;
+    // Search YouTube for each track sequentially (memory-conscious for 256MB)
     const results: SearchResult[] = [];
 
-    for (let i = 0; i < tracksToProcess.length; i += batchSize) {
-      const batch = tracksToProcess.slice(i, i + batchSize);
-      const batchResults = await Promise.allSettled(
-        batch.map(async (track) => {
-          // Clean up search query for better matching
-          const cleanName = track.name
-            .replace(/\s*\(feat\..*?\)/gi, '')      // remove (feat. ...)
-            .replace(/\s*\[feat\..*?\]/gi, '')      // remove [feat. ...]
-            .replace(/\s*\(with\s.*?\)/gi, '')      // remove (with ...)
-            .replace(/\s*\(Remaster(ed)?\)/gi, '')  // remove (Remastered)
-            .replace(/\s*-\s*Remaster(ed)?/gi, '') // remove - Remastered
-            .trim();
-          // Use primary artist only for cleaner query
-          const primaryArtist = track.artists.split(',')[0].trim();
-          const query = `${cleanName} ${primaryArtist}`;
-          const searchResults = await searchTracks(query);
-          return searchResults[0] || null;
-        })
-      );
-
-      for (const r of batchResults) {
-        if (r.status === 'fulfilled' && r.value) {
-          results.push(r.value);
-        }
+    for (const track of tracksToProcess) {
+      try {
+        const cleanName = track.name
+          .replace(/\s*\(feat\..*?\)/gi, '')
+          .replace(/\s*\[feat\..*?\]/gi, '')
+          .replace(/\s*\(with\s.*?\)/gi, '')
+          .replace(/\s*\(Remaster(ed)?\)/gi, '')
+          .replace(/\s*-\s*Remaster(ed)?/gi, '')
+          .trim();
+        const primaryArtist = track.artists.split(',')[0].trim();
+        const query = `${cleanName} ${primaryArtist}`;
+        const searchResults = await searchTracks(query);
+        if (searchResults[0]) results.push(searchResults[0]);
+      } catch {
+        // Skip failed tracks, continue
       }
     }
 
