@@ -8,11 +8,14 @@ import {
   IoTrashOutline,
   IoLogOutOutline,
   IoPlaySharp,
+  IoCloseOutline,
 } from 'react-icons/io5';
+import { SiSpotify } from 'react-icons/si';
 import { useAuthStore } from '../stores/authStore';
 import { useQueueStore } from '../stores/queueStore';
 import * as api from '../services/api';
 import type { Playlist } from '../types';
+import type { SearchResult } from '../types';
 import { formatDuration } from '../utils/format';
 import toast from 'react-hot-toast';
 
@@ -26,6 +29,10 @@ export function LibraryPage() {
   const [activeTab, setActiveTab] = useState<'playlists' | 'liked'>('playlists');
   const [playlistTracks, setPlaylistTracks] = useState<any[]>([]);
   const [activePlaylist, setActivePlaylist] = useState<Playlist | null>(null);
+  const [showSpotifyImport, setShowSpotifyImport] = useState(false);
+  const [spotifyUrl, setSpotifyUrl] = useState('');
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{ playlistName: string; totalTracks: number; matchedTracks: SearchResult[] } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -77,6 +84,52 @@ export function LibraryPage() {
     } catch {
       toast.error('Failed to load playlist');
     }
+  };
+
+  const handleSpotifyImport = async () => {
+    if (!spotifyUrl.trim()) return;
+    setImporting(true);
+    setImportResult(null);
+    try {
+      const result = await api.importSpotifyPlaylist(spotifyUrl.trim());
+      setImportResult(result);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to import playlist');
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const addImportToQueue = () => {
+    if (!importResult) return;
+    const q = useQueueStore.getState();
+    for (const track of importResult.matchedTracks) {
+      q.addTrack(track);
+    }
+    toast.success(`Added ${importResult.matchedTracks.length} songs to queue`);
+    closeImportModal();
+  };
+
+  const addImportAsPlaylist = async () => {
+    if (!importResult) return;
+    try {
+      const pl = await api.createPlaylist(importResult.playlistName);
+      for (const track of importResult.matchedTracks) {
+        await api.addToPlaylist(pl.id, track);
+      }
+      toast.success(`Created playlist "${importResult.playlistName}" with ${importResult.matchedTracks.length} songs`);
+      closeImportModal();
+      loadData();
+    } catch {
+      toast.error('Failed to save playlist');
+    }
+  };
+
+  const closeImportModal = () => {
+    setShowSpotifyImport(false);
+    setSpotifyUrl('');
+    setImportResult(null);
+    setImporting(false);
   };
 
   const playPlaylist = () => {
@@ -175,15 +228,26 @@ export function LibraryPage() {
               <button onClick={() => setShowCreate(false)} className="btn-ghost">Cancel</button>
             </div>
           ) : (
-            <button
-              onClick={() => setShowCreate(true)}
-              className="w-full panel panel-hover rounded-xl p-4 flex items-center gap-3 text-cream-dim"
-            >
-              <div className="w-12 h-12 rounded-lg bg-surface-300/60 flex items-center justify-center">
-                <IoAddOutline className="text-2xl" />
-              </div>
-              <span className="font-medium">Create new playlist</span>
-            </button>
+            <div className="space-y-2">
+              <button
+                onClick={() => setShowCreate(true)}
+                className="w-full panel panel-hover rounded-xl p-4 flex items-center gap-3 text-cream-dim"
+              >
+                <div className="w-12 h-12 rounded-lg bg-surface-300/60 flex items-center justify-center">
+                  <IoAddOutline className="text-2xl" />
+                </div>
+                <span className="font-medium">Create new playlist</span>
+              </button>
+              <button
+                onClick={() => setShowSpotifyImport(true)}
+                className="w-full panel panel-hover rounded-xl p-4 flex items-center gap-3 text-cream-dim"
+              >
+                <div className="w-12 h-12 rounded-lg bg-[#1DB954]/15 flex items-center justify-center">
+                  <SiSpotify className="text-xl text-[#1DB954]" />
+                </div>
+                <span className="font-medium">Import from Spotify</span>
+              </button>
+            </div>
           )}
 
           {/* Playlist list */}
@@ -274,6 +338,98 @@ export function LibraryPage() {
               </div>
             ))
           )}
+        </div>
+      )}
+
+      {/* Spotify Import Modal */}
+      {showSpotifyImport && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={closeImportModal}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-surface rounded-2xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="flex items-center justify-between p-5 border-b border-surface-200">
+              <div className="flex items-center gap-3">
+                <SiSpotify className="text-[#1DB954] text-xl" />
+                <h3 className="font-display text-lg text-cream">Import from Spotify</h3>
+              </div>
+              <button onClick={closeImportModal} className="text-cream-muted hover:text-cream p-1">
+                <IoCloseOutline className="text-xl" />
+              </button>
+            </div>
+
+            {/* Modal body */}
+            <div className="p-5 space-y-4 overflow-y-auto flex-1">
+              {!importResult ? (
+                <>
+                  <p className="text-cream-muted text-sm">Paste a Spotify playlist link to import songs. We'll find matching tracks on YouTube.</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={spotifyUrl}
+                      onChange={(e) => setSpotifyUrl(e.target.value)}
+                      placeholder="https://open.spotify.com/playlist/..."
+                      className="input-field flex-1 text-sm"
+                      autoFocus
+                      onKeyDown={(e) => e.key === 'Enter' && handleSpotifyImport()}
+                      disabled={importing}
+                    />
+                    <button onClick={handleSpotifyImport} disabled={importing || !spotifyUrl.trim()} className="btn-primary text-sm whitespace-nowrap">
+                      {importing ? 'Importing...' : 'Import'}
+                    </button>
+                  </div>
+                  {importing && (
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                        <p className="text-cream-dim text-sm">Fetching tracks and finding YouTube matches... This may take a moment.</p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="panel rounded-xl p-4">
+                    <h4 className="font-display text-cream">{importResult.playlistName}</h4>
+                    <p className="text-cream-muted text-xs mt-1">
+                      {importResult.matchedTracks.length} of {importResult.totalTracks} tracks matched
+                      {importResult.totalTracks > 50 && ' (first 50 processed)'}
+                    </p>
+                  </div>
+
+                  {/* Track list preview */}
+                  <div className="space-y-0.5 max-h-[40vh] overflow-y-auto">
+                    {importResult.matchedTracks.map((t, i) => (
+                      <div key={`${t.videoId}-${i}`} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-200/60">
+                        <span className="text-xs text-cream-muted w-5 text-right tabular-nums">{i + 1}</span>
+                        <img src={t.thumbnail} alt={t.title} className="w-9 h-9 rounded object-cover" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-cream truncate">{t.title}</p>
+                          <p className="text-xs text-cream-muted truncate">{t.artist}</p>
+                        </div>
+                        <span className="text-xs text-cream-muted tabular-nums">{formatDuration(t.duration)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Modal footer */}
+            {importResult && (
+              <div className="p-5 border-t border-surface-200 flex gap-2">
+                <button onClick={addImportToQueue} className="btn-ghost flex-1 text-sm">
+                  <IoPlaySharp className="inline mr-1" /> Add to Queue
+                </button>
+                <button onClick={addImportAsPlaylist} className="btn-primary flex-1 text-sm">
+                  <IoMusicalNotesOutline className="inline mr-1" /> Save as Playlist
+                </button>
+              </div>
+            )}
+          </motion.div>
         </div>
       )}
     </motion.div>

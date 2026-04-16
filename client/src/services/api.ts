@@ -113,3 +113,10 @@ export const likeTrack = (track: SearchResult) =>
 
 export const unlikeTrack = (videoId: string) =>
   apiFetch<any>(`/playlists/liked/tracks/${videoId}`, { method: 'DELETE' });
+
+// Spotify import
+export const importSpotifyPlaylist = (url: string) =>
+  apiFetch<{ playlistName: string; totalTracks: number; matchedTracks: SearchResult[] }>('/spotify/import', {
+    method: 'POST',
+    body: JSON.stringify({ url }),
+  });

@@ -8,6 +8,7 @@ import { searchRouter } from './routes/search.js';
 import { streamRouter } from './routes/stream.js';
 import { authRouter } from './routes/auth.js';
 import { playlistRouter } from './routes/playlist.js';
+import { spotifyRouter } from './routes/spotify.js';
 import { initJamHandler } from './socket/jamHandler.js';
 import { initDb } from './db/schema.js';
 
@@ -39,6 +40,7 @@ app.use('/api/search', searchRouter);
 app.use('/api/stream', streamRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/playlists', playlistRouter);
+app.use('/api/spotify', spotifyRouter);
 
 // Serve static files in production
 const clientDist = path.join(__dirname, '../../client/dist');
