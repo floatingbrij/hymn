@@ -64,7 +64,7 @@ export async function getStreamInfo(videoId: string) {
 
   try {
     const { stdout } = await execAsync(
-      `python -m yt_dlp -f "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio" --dump-json --no-download --no-warnings "https://www.youtube.com/watch?v=${videoId}"`,
+      `yt-dlp -f "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio" --dump-json --no-download --no-warnings "https://www.youtube.com/watch?v=${videoId}"`,
       { timeout: 30000, maxBuffer: 10 * 1024 * 1024 }
     );
 
@@ -105,7 +105,7 @@ export async function getTrending(): Promise<SearchResult[]> {
   for (const source of sources) {
     try {
       const { stdout } = await execAsync(
-        `python -m yt_dlp --flat-playlist --dump-json --no-warnings "${source}"`,
+        `yt-dlp --flat-playlist --dump-json --no-warnings "${source}"`,
         { timeout: 30000, maxBuffer: 10 * 1024 * 1024 }
       );
 
