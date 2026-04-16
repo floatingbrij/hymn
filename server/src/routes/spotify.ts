@@ -118,8 +118,8 @@ spotifyRouter.post('/import', async (req, res) => {
     // Process all tracks (up to 200 from fetch)
     const tracksToProcess = playlistData.tracks;
 
-    // Search YouTube for each track in batches of 5
-    const batchSize = 5;
+    // Search YouTube for each track in batches of 3 (memory-conscious)
+    const batchSize = 3;
     const results: SearchResult[] = [];
 
     for (let i = 0; i < tracksToProcess.length; i += batchSize) {
