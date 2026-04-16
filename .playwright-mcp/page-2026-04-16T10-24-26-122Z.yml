@@ -1,0 +1,386 @@
+- generic [ref=e3]:
+  - complementary [ref=e5]:
+    - button "hymn" [ref=e7] [cursor=pointer]:
+      - img [ref=e9]
+      - generic [ref=e12]: hymn
+    - navigation [ref=e13]:
+      - link "Home" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - text: Home
+      - link "Search" [ref=e18] [cursor=pointer]:
+        - /url: /search
+        - img [ref=e19]
+        - text: Search
+      - link "Library" [ref=e22] [cursor=pointer]:
+        - /url: /library
+        - img [ref=e23]
+        - text: Library
+      - link "Start a Jam" [ref=e29] [cursor=pointer]:
+        - /url: /jam
+        - img [ref=e30]
+        - text: Start a Jam
+    - button "Sign in" [ref=e34] [cursor=pointer]:
+      - img [ref=e35]
+      - text: Sign in
+  - main [ref=e38]:
+    - generic [ref=e40]:
+      - generic [ref=e41]:
+        - heading "Search" [level=1] [ref=e42]
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - img [ref=e45]
+            - textbox "What do you want to listen to?" [active] [ref=e48]: Bohemian Rhapsody Queen
+            - button [ref=e103] [cursor=pointer]:
+              - img [ref=e104]
+          - generic [ref=e106]:
+            - button "bohemian rhapsody queen" [ref=e107] [cursor=pointer]:
+              - img [ref=e108]
+              - text: bohemian rhapsody queen
+            - button "bohemian rhapsody queen live" [ref=e111] [cursor=pointer]:
+              - img [ref=e112]
+              - text: bohemian rhapsody queen live
+            - button "bohemian rhapsody queen lyrics" [ref=e115] [cursor=pointer]:
+              - img [ref=e116]
+              - text: bohemian rhapsody queen lyrics
+            - button "bohemian rhapsody queen gets back together" [ref=e119] [cursor=pointer]:
+              - img [ref=e120]
+              - text: bohemian rhapsody queen gets back together
+            - button "bohemian rhapsody queen movie" [ref=e123] [cursor=pointer]:
+              - img [ref=e124]
+              - text: bohemian rhapsody queen movie
+            - button "bohemian rhapsody queen karaoke" [ref=e127] [cursor=pointer]:
+              - img [ref=e128]
+              - text: bohemian rhapsody queen karaoke
+            - button "bohemian rhapsody queen live aid" [ref=e131] [cursor=pointer]:
+              - img [ref=e132]
+              - text: bohemian rhapsody queen live aid
+            - button "bohemian rhapsody queen reaction" [ref=e135] [cursor=pointer]:
+              - img [ref=e136]
+              - text: bohemian rhapsody queen reaction
+      - generic [ref=e139]:
+        - paragraph [ref=e140]: 20 results
+        - generic [ref=e142] [cursor=pointer]:
+          - generic [ref=e143]:
+            - img "Queen – Bohemian Rhapsody (Official Video Remastered)" [ref=e144]
+            - img [ref=e146]
+          - generic [ref=e148]:
+            - paragraph [ref=e149]: Queen – Bohemian Rhapsody (Official Video Remastered)
+            - paragraph [ref=e150]: Queen Official
+          - generic [ref=e151]:
+            - button "Like" [ref=e152]:
+              - img [ref=e153]
+            - generic [ref=e155]: 6:00
+            - button "Add to queue" [ref=e156]:
+              - img [ref=e157]
+            - button "More options" [ref=e160]:
+              - img [ref=e161]
+        - generic [ref=e166] [cursor=pointer]:
+          - generic [ref=e167]:
+            - img "Queen - Bohemian Rhapsody (Lyrics)" [ref=e168]
+            - img [ref=e170]
+          - generic [ref=e172]:
+            - paragraph [ref=e173]: Queen - Bohemian Rhapsody (Lyrics)
+            - paragraph [ref=e174]: 7clouds Rock
+          - generic [ref=e175]:
+            - button "Like" [ref=e176]:
+              - img [ref=e177]
+            - generic [ref=e179]: 5:55
+            - button "Add to queue" [ref=e180]:
+              - img [ref=e181]
+            - button "More options" [ref=e184]:
+              - img [ref=e185]
+        - generic [ref=e190] [cursor=pointer]:
+          - generic [ref=e191]:
+            - img "Queen - Bohemian Rhapsody (Live Aid 1985)" [ref=e192]
+            - img [ref=e194]
+          - generic [ref=e196]:
+            - paragraph [ref=e197]: Queen - Bohemian Rhapsody (Live Aid 1985)
+            - paragraph [ref=e198]: Live Aid and Queen Official
+          - generic [ref=e199]:
+            - button "Like" [ref=e200]:
+              - img [ref=e201]
+            - generic [ref=e203]: 2:45
+            - button "Add to queue" [ref=e204]:
+              - img [ref=e205]
+            - button "More options" [ref=e208]:
+              - img [ref=e209]
+        - generic [ref=e214] [cursor=pointer]:
+          - generic [ref=e215]:
+            - img "Bohemian Rhapsody (Remastered 2011)" [ref=e216]
+            - img [ref=e218]
+          - generic [ref=e220]:
+            - paragraph [ref=e221]: Bohemian Rhapsody (Remastered 2011)
+            - paragraph [ref=e222]: This Is Queen
+          - generic [ref=e223]:
+            - button "Like" [ref=e224]:
+              - img [ref=e225]
+            - generic [ref=e227]: 5:55
+            - button "Add to queue" [ref=e228]:
+              - img [ref=e229]
+            - button "More options" [ref=e232]:
+              - img [ref=e233]
+        - generic [ref=e238] [cursor=pointer]:
+          - generic [ref=e239]:
+            - img "Queen - Bohemian Rhapsody (Live at Rock Montreal, 1981) [HD]" [ref=e240]
+            - img [ref=e242]
+          - generic [ref=e244]:
+            - paragraph [ref=e245]: Queen - Bohemian Rhapsody (Live at Rock Montreal, 1981) [HD]
+            - paragraph [ref=e246]: Vander
+          - generic [ref=e247]:
+            - button "Like" [ref=e248]:
+              - img [ref=e249]
+            - generic [ref=e251]: 5:32
+            - button "Add to queue" [ref=e252]:
+              - img [ref=e253]
+            - button "More options" [ref=e256]:
+              - img [ref=e257]
+        - generic [ref=e262] [cursor=pointer]:
+          - generic [ref=e263]:
+            - img "Bohemian Rhapsody" [ref=e264]
+            - img [ref=e266]
+          - generic [ref=e268]:
+            - paragraph [ref=e269]: Bohemian Rhapsody
+            - paragraph [ref=e270]: Queen Official
+          - generic [ref=e271]:
+            - button "Like" [ref=e272]:
+              - img [ref=e273]
+            - generic [ref=e275]: 5:54
+            - button "Add to queue" [ref=e276]:
+              - img [ref=e277]
+            - button "More options" [ref=e280]:
+              - img [ref=e281]
+        - generic [ref=e286] [cursor=pointer]:
+          - generic [ref=e287]:
+            - img "Queen - Bohemian Rhapsody (HQ)" [ref=e288]
+            - img [ref=e290]
+          - generic [ref=e292]:
+            - paragraph [ref=e293]: Queen - Bohemian Rhapsody (HQ)
+            - paragraph [ref=e294]: Hits Of The Music
+          - generic [ref=e295]:
+            - button "Like" [ref=e296]:
+              - img [ref=e297]
+            - generic [ref=e299]: 5:55
+            - button "Add to queue" [ref=e300]:
+              - img [ref=e301]
+            - button "More options" [ref=e304]:
+              - img [ref=e305]
+        - generic [ref=e310] [cursor=pointer]:
+          - generic [ref=e311]:
+            - img "Queen - Bohemian Rhapsody (Lyrics)" [ref=e312]
+            - img [ref=e314]
+          - generic [ref=e316]:
+            - paragraph [ref=e317]: Queen - Bohemian Rhapsody (Lyrics)
+            - paragraph [ref=e318]: Golden Network
+          - generic [ref=e319]:
+            - button "Like" [ref=e320]:
+              - img [ref=e321]
+            - generic [ref=e323]: 5:55
+            - button "Add to queue" [ref=e324]:
+              - img [ref=e325]
+            - button "More options" [ref=e328]:
+              - img [ref=e329]
+        - generic [ref=e334] [cursor=pointer]:
+          - generic [ref=e335]:
+            - img "The most INSANE Bohemian Rhapsody Flashmob you will ever see!!" [ref=e336]
+            - img [ref=e338]
+          - generic [ref=e340]:
+            - paragraph [ref=e341]: The most INSANE Bohemian Rhapsody Flashmob you will ever see!!
+            - paragraph [ref=e342]: Julien Cohen
+          - generic [ref=e343]:
+            - button "Like" [ref=e344]:
+              - img [ref=e345]
+            - generic [ref=e347]: 5:59
+            - button "Add to queue" [ref=e348]:
+              - img [ref=e349]
+            - button "More options" [ref=e352]:
+              - img [ref=e353]
+        - generic [ref=e358] [cursor=pointer]:
+          - generic [ref=e359]:
+            - img "Queen - Bohemian Rhapsody (Karaoke Version)" [ref=e360]
+            - img [ref=e362]
+          - generic [ref=e364]:
+            - paragraph [ref=e365]: Queen - Bohemian Rhapsody (Karaoke Version)
+            - paragraph [ref=e366]: Sing King
+          - generic [ref=e367]:
+            - button "Like" [ref=e368]:
+              - img [ref=e369]
+            - generic [ref=e371]: 6:15
+            - button "Add to queue" [ref=e372]:
+              - img [ref=e373]
+            - button "More options" [ref=e376]:
+              - img [ref=e377]
+        - generic [ref=e382] [cursor=pointer]:
+          - generic [ref=e383]:
+            - img "Bohemian Rhapsody 2018 BONUS Complete Live Aid Performance 1080p BluRay x264 DTS FGT" [ref=e384]
+            - img [ref=e386]
+          - generic [ref=e388]:
+            - paragraph [ref=e389]: Bohemian Rhapsody 2018 BONUS Complete Live Aid Performance 1080p BluRay x264 DTS FGT
+            - paragraph [ref=e390]: Rulli Haerul
+          - generic [ref=e391]:
+            - button "Like" [ref=e392]:
+              - img [ref=e393]
+            - generic [ref=e395]: 21:56
+            - button "Add to queue" [ref=e396]:
+              - img [ref=e397]
+            - button "More options" [ref=e400]:
+              - img [ref=e401]
+        - generic [ref=e406] [cursor=pointer]:
+          - generic [ref=e407]:
+            - img "Queen - Greatest Hits (1) [1 hour long]" [ref=e408]
+            - img [ref=e410]
+          - generic [ref=e412]:
+            - paragraph [ref=e413]: Queen - Greatest Hits (1) [1 hour long]
+            - paragraph [ref=e414]: Queen Official
+          - generic [ref=e415]:
+            - button "Like" [ref=e416]:
+              - img [ref=e417]
+            - generic [ref=e419]: 1:02:26
+            - button "Add to queue" [ref=e420]:
+              - img [ref=e421]
+            - button "More options" [ref=e424]:
+              - img [ref=e425]
+        - generic [ref=e430] [cursor=pointer]:
+          - generic [ref=e431]:
+            - img "Bohemian Rhapsody - Recording The Operatic Section Scene (Rami Malek Freddie Mercury)" [ref=e432]
+            - img [ref=e434]
+          - generic [ref=e436]:
+            - paragraph [ref=e437]: Bohemian Rhapsody - Recording The Operatic Section Scene (Rami Malek Freddie Mercury)
+            - paragraph [ref=e438]: Cian
+          - generic [ref=e439]:
+            - button "Like" [ref=e440]:
+              - img [ref=e441]
+            - generic [ref=e443]: 4:54
+            - button "Add to queue" [ref=e444]:
+              - img [ref=e445]
+            - button "More options" [ref=e448]:
+              - img [ref=e449]
+        - generic [ref=e454] [cursor=pointer]:
+          - generic [ref=e455]:
+            - img "Queen - Bohemian Rhapsody (Lyrics)" [ref=e456]
+            - img [ref=e458]
+          - generic [ref=e460]:
+            - paragraph [ref=e461]: Queen - Bohemian Rhapsody (Lyrics)
+            - paragraph [ref=e462]: 7clouds
+          - generic [ref=e463]:
+            - button "Like" [ref=e464]:
+              - img [ref=e465]
+            - generic [ref=e467]: 5:55
+            - button "Add to queue" [ref=e468]:
+              - img [ref=e469]
+            - button "More options" [ref=e472]:
+              - img [ref=e473]
+        - generic [ref=e478] [cursor=pointer]:
+          - generic [ref=e479]:
+            - img "Bohemian Rhapsody - Queen (HD Karaoke)" [ref=e480]
+            - img [ref=e482]
+          - generic [ref=e484]:
+            - paragraph [ref=e485]: Bohemian Rhapsody - Queen (HD Karaoke)
+            - paragraph [ref=e486]: Atomic Karaoke...
+          - generic [ref=e487]:
+            - button "Like" [ref=e488]:
+              - img [ref=e489]
+            - generic [ref=e491]: 6:03
+            - button "Add to queue" [ref=e492]:
+              - img [ref=e493]
+            - button "More options" [ref=e496]:
+              - img [ref=e497]
+        - generic [ref=e502] [cursor=pointer]:
+          - generic [ref=e503]:
+            - img "Bohemian Rhapsody - Another One Bites The Dust Scene (Rami Malek Freddie Mercury)" [ref=e504]
+            - img [ref=e506]
+          - generic [ref=e508]:
+            - paragraph [ref=e509]: Bohemian Rhapsody - Another One Bites The Dust Scene (Rami Malek Freddie Mercury)
+            - paragraph [ref=e510]: Cian
+          - generic [ref=e511]:
+            - button "Like" [ref=e512]:
+              - img [ref=e513]
+            - generic [ref=e515]: 3:37
+            - button "Add to queue" [ref=e516]:
+              - img [ref=e517]
+            - button "More options" [ref=e520]:
+              - img [ref=e521]
+        - generic [ref=e526] [cursor=pointer]:
+          - generic [ref=e527]:
+            - 'img "Angelina Jordan - Bohemian Rhapsody - America''s Got Talent: The Champions One - January 6, 2020" [ref=e528]'
+            - img [ref=e530]
+          - generic [ref=e532]:
+            - paragraph [ref=e533]: "Angelina Jordan - Bohemian Rhapsody - America's Got Talent: The Champions One - January 6, 2020"
+            - paragraph [ref=e534]: MovieClips
+          - generic [ref=e535]:
+            - button "Like" [ref=e536]:
+              - img [ref=e537]
+            - generic [ref=e539]: 4:49
+            - button "Add to queue" [ref=e540]:
+              - img [ref=e541]
+            - button "More options" [ref=e544]:
+              - img [ref=e545]
+        - generic [ref=e550] [cursor=pointer]:
+          - generic [ref=e551]:
+            - img "Inside The Rhapsody (Bohemian Rhapsody mini documentary, 2002) 3 of 3" [ref=e552]
+            - img [ref=e554]
+          - generic [ref=e556]:
+            - paragraph [ref=e557]: Inside The Rhapsody (Bohemian Rhapsody mini documentary, 2002) 3 of 3
+            - paragraph [ref=e558]: Queen Official
+          - generic [ref=e559]:
+            - button "Like" [ref=e560]:
+              - img [ref=e561]
+            - generic [ref=e563]: 27:15
+            - button "Add to queue" [ref=e564]:
+              - img [ref=e565]
+            - button "More options" [ref=e568]:
+              - img [ref=e569]
+        - generic [ref=e574] [cursor=pointer]:
+          - generic [ref=e575]:
+            - img "Queen - Bohemian Rhapsody - Greatest Hits I - II - III Platinum Collection" [ref=e576]
+            - img [ref=e578]
+          - generic [ref=e580]:
+            - paragraph [ref=e581]: Queen - Bohemian Rhapsody - Greatest Hits I - II - III Platinum Collection
+            - paragraph [ref=e582]: Tom Bauer
+          - generic [ref=e583]:
+            - button "Like" [ref=e584]:
+              - img [ref=e585]
+            - generic [ref=e587]: 5:59
+            - button "Add to queue" [ref=e588]:
+              - img [ref=e589]
+            - button "More options" [ref=e592]:
+              - img [ref=e593]
+        - generic [ref=e598] [cursor=pointer]:
+          - generic [ref=e599]:
+            - img "Queen - Bohemian Rhapsody (Lyrics)" [ref=e600]
+            - img [ref=e602]
+          - generic [ref=e604]:
+            - paragraph [ref=e605]: Queen - Bohemian Rhapsody (Lyrics)
+            - paragraph [ref=e606]: Vibe Tracks
+          - generic [ref=e607]:
+            - button "Like" [ref=e608]:
+              - img [ref=e609]
+            - generic [ref=e611]: 6:01
+            - button "Add to queue" [ref=e612]:
+              - img [ref=e613]
+            - button "More options" [ref=e616]:
+              - img [ref=e617]
+  - generic [ref=e56]:
+    - generic [ref=e58]:
+      - img [ref=e60]
+      - paragraph [ref=e63]: No track playing
+    - generic [ref=e64]:
+      - generic [ref=e65]:
+        - button "Shuffle" [ref=e66] [cursor=pointer]:
+          - img [ref=e67]
+        - button "Previous" [ref=e70] [cursor=pointer]:
+          - img [ref=e71]
+        - button "Play" [disabled] [ref=e73]:
+          - img [ref=e74]
+        - button "Next" [ref=e76] [cursor=pointer]:
+          - img [ref=e77]
+        - 'button "Repeat: off" [ref=e79] [cursor=pointer]':
+          - img [ref=e80]
+      - generic [ref=e84]:
+        - generic [ref=e85]: 0:00
+        - generic [ref=e88]: 0:00
+    - generic [ref=e89]:
+      - button "Mute" [ref=e91] [cursor=pointer]:
+        - img [ref=e92]
+      - button "Queue" [ref=e97] [cursor=pointer]:
+        - img [ref=e98]

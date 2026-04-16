@@ -62,7 +62,15 @@ export async function searchSuggestions(query: string): Promise<string[]> {
   }
 }
 
-// ── Stream info via yt-dlp (most reliable YouTube extractor) ──
+// ── Stream info via Piped API (avoids YouTube bot detection on server IPs) ──
+
+const PIPED_INSTANCES = [
+  'https://pipedapi.kavin.rocks',
+  'https://pipedapi.adminforge.de',
+  'https://api.piped.yt',
+  'https://pipedapi.r4fo.com',
+  'https://pipedapi.moomoo.me',
+];
 
 // Cache stream URLs for 30 minutes (they expire after ~6 hours)
 const streamCache = new Map<string, { data: any; timestamp: number }>();
@@ -75,6 +83,49 @@ export async function getStreamInfo(videoId: string) {
     return cached.data;
   }
 
+  // Try Piped API instances (they handle YouTube bot detection)
+  for (const instance of PIPED_INSTANCES) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+      const res = await fetch(`${instance}/streams/${videoId}`, { signal: controller.signal });
+      clearTimeout(timeout);
+
+      if (!res.ok) continue;
+
+      const data = await res.json();
+      if (!data.audioStreams?.length) continue;
+
+      // Find best audio stream (prefer opus/webm, highest bitrate)
+      const audioStreams = data.audioStreams
+        .filter((s: any) => s.url && s.mimeType?.startsWith('audio/'))
+        .sort((a: any, b: any) => (b.bitrate || 0) - (a.bitrate || 0));
+
+      if (audioStreams.length === 0) continue;
+
+      const result = {
+        title: data.title || '',
+        uploader: data.uploader || '',
+        uploaderUrl: data.uploaderUrl || '',
+        thumbnail: data.thumbnailUrl || `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
+        duration: data.duration || 0,
+        audioStreams: audioStreams.map((s: any) => ({
+          url: s.url,
+          mimeType: s.mimeType || 'audio/webm',
+          bitrate: s.bitrate || 128000,
+          codec: s.codec || 'opus',
+        })),
+        bestAudioUrl: audioStreams[0].url,
+      };
+
+      streamCache.set(videoId, { data: result, timestamp: Date.now() });
+      return result;
+    } catch {
+      // Try next instance
+    }
+  }
+
+  // Fallback: try yt-dlp (may work on some server IPs)
   try {
     const { stdout } = await execAsync(
       `yt-dlp -f "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio" --dump-json --no-download --no-warnings "https://www.youtube.com/watch?v=${videoId}"`,
@@ -97,12 +148,10 @@ export async function getStreamInfo(videoId: string) {
       bestAudioUrl: info.url,
     };
 
-    // Cache the result
     streamCache.set(videoId, { data: result, timestamp: Date.now() });
-
     return result;
   } catch (err) {
-    console.error('yt-dlp stream extraction failed:', err);
+    console.error('All stream sources failed for', videoId);
     throw new Error('Failed to extract audio stream');
   }
 }
